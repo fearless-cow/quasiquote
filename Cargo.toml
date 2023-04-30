@@ -1,0 +1,20 @@
+[workspace]
+
+[workspace.dependencies]
+quote = "1.0.26"
+proc-macro2 = "1.0.52"
+
+[package]
+name = "quasiquote"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+quasiquote-proc-macro = { path = "quasiquote-proc-macro" }
+quote = { workspace = true }
+proc-macro2 = { workspace = true }
+
+[dev-dependencies]
+quasiquote-proc-macro = { path = "quasiquote-proc-macro" }
+quote = { workspace = true }
+proc-macro2 = { workspace = true }
