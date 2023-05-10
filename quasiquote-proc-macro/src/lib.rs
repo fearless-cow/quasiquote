@@ -1,3 +1,5 @@
+#![feature(let_chains)]
+
 pub(crate) mod quasiquote;
 
 #[allow(unused_macros)]
