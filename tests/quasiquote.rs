@@ -1,4 +1,4 @@
-use quasiquote::quasiquote;
+use quasiquote::{quasiquote, quote::quote};
 use std::fmt;
 
 fn compare_strings<A, B>(a: A, b: B)
@@ -36,6 +36,23 @@ fn pass_through() {
             let b = {
                 1 + 2 + (3 + 4)
             };
+        }
+    };
+    compare_strings(a, b);
+}
+
+#[test]
+fn interpolate_binding() {
+    let i = quote! { 2 };
+    let a = quasiquote! {
+        fn f() {
+            let x = #i * 2;
+        }
+    }
+    .to_string();
+    let b = stringify! {
+        fn f() {
+            let x = 2 * 2;
         }
     };
     compare_strings(a, b);

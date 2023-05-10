@@ -10,17 +10,20 @@ trait QuasiQuote {
     fn quasiquote(&self) -> TokenStream;
 }
 
+#[derive(Debug, Clone)]
 enum Token {
     Ident(Ident),
     Literal(Literal),
     Punct(Punct),
 }
 
+#[derive(Debug, Clone)]
 enum IterItem {
     Token(Token),
     Group(Group),
 }
 
+#[derive(Debug, Clone)]
 struct Parser(TokenIter);
 
 pub fn expand(input: TokenStream) -> TokenStream {
