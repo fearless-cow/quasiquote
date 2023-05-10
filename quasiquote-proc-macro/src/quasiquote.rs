@@ -18,10 +18,19 @@ enum Token {
 }
 
 #[derive(Debug, Clone)]
+enum Interpolation {
+    Binding(Binding),
+}
+
+#[derive(Debug, Clone)]
 enum IterItem {
     Token(Token),
     Group(Group),
+    Interpolation(Interpolation),
 }
+
+#[derive(Debug, Clone)]
+struct Binding(Ident);
 
 #[derive(Debug, Clone)]
 struct Parser(TokenIter);
@@ -32,6 +41,7 @@ pub fn expand(input: TokenStream) -> TokenStream {
     for item in parser {
         let quasiquoted = match item {
             IterItem::Token(q) => q.quasiquote(),
+            IterItem::Interpolation(interpolation) => interpolation.quasiquote(),
             IterItem::Group(g) => {
                 let inner = expand(g.stream());
                 let group = Group::new(g.delimiter(), inner);
@@ -67,6 +77,25 @@ impl QuasiQuote for Token {
             Self::Ident(i) => i.quasiquote(),
             Self::Literal(l) => l.quasiquote(),
             Self::Punct(p) => p.quasiquote(),
+        }
+    }
+}
+
+impl QuasiQuote for Interpolation {
+    fn quasiquote(&self) -> TokenStream {
+        match self {
+            Self::Binding(binding) => binding.quasiquote(),
+        }
+    }
+}
+
+impl QuasiQuote for Binding {
+    fn quasiquote(&self) -> TokenStream {
+        let inner = &self.0;
+        quote! {
+            {
+                &#inner
+            }
         }
     }
 }
@@ -133,11 +162,26 @@ impl QuasiQuote for Spacing {
 impl Iterator for Parser {
     type Item = IterItem;
     fn next(&mut self) -> Option<Self::Item> {
-        Some(match self.0.next()? {
-            TokenTree::Ident(i) => IterItem::Token(Token::Ident(i)),
-            TokenTree::Literal(l) => IterItem::Token(Token::Literal(l)),
-            TokenTree::Punct(p) => IterItem::Token(Token::Punct(p)),
-            TokenTree::Group(g) => IterItem::Group(g),
+        let token = self.0.next()?;
+        Some(if let TokenTree::Punct(ref punct) = token
+            && punct.as_char() == '#'
+            && let Some(TokenTree::Ident(ident)) = self.0.peek().cloned()
+        {
+            let _ = self.0.next();
+            IterItem::Interpolation(Interpolation::Binding(Binding(ident)))
+        } else if let TokenTree::Punct(ref punct) = token
+              && punct.as_char() == '#'
+              && let Some(TokenTree::Group(group)) = self.0.peek()
+              && let Delimiter::Parenthesis | Delimiter::Brace = group.delimiter()
+        {
+            todo!()
+        } else {
+            match token {
+                TokenTree::Ident(i) => IterItem::Token(Token::Ident(i)),
+                TokenTree::Literal(l) => IterItem::Token(Token::Literal(l)),
+                TokenTree::Punct(p) => IterItem::Token(Token::Punct(p)),
+                TokenTree::Group(g) => IterItem::Group(g),
+            }
         })
     }
 }
