@@ -19,7 +19,7 @@ enum Token {
 
 #[derive(Debug, Clone)]
 enum Interpolation {
-    Binding(Binding),
+    Binding(Ident),
 }
 
 #[derive(Debug, Clone)]
@@ -28,9 +28,6 @@ enum IterItem {
     Group(Group),
     Interpolation(Interpolation),
 }
-
-#[derive(Debug, Clone)]
-struct Binding(Ident);
 
 #[derive(Debug, Clone)]
 struct Parser(TokenIter);
@@ -84,17 +81,8 @@ impl QuasiQuote for Token {
 impl QuasiQuote for Interpolation {
     fn quasiquote(&self) -> TokenStream {
         match self {
-            Self::Binding(binding) => binding.quasiquote(),
-        }
-    }
-}
-
-impl QuasiQuote for Binding {
-    fn quasiquote(&self) -> TokenStream {
-        let inner = &self.0;
-        quote! {
-            {
-                &#inner
+            Self::Binding(binding) => {
+                quote! {{&#binding}}
             }
         }
     }
@@ -168,7 +156,7 @@ impl Iterator for Parser {
             && let Some(TokenTree::Ident(ident)) = self.0.peek().cloned()
         {
             let _ = self.0.next();
-            IterItem::Interpolation(Interpolation::Binding(Binding(ident)))
+            IterItem::Interpolation(Interpolation::Binding(ident))
         } else if let TokenTree::Punct(ref punct) = token
               && punct.as_char() == '#'
               && let Some(TokenTree::Group(group)) = self.0.peek()
