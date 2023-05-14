@@ -42,6 +42,24 @@ impl InnerIterator {
     }
 }
 
+impl From<quasiquote::Token> for IterItem {
+    fn from(value: quasiquote::Token) -> Self {
+        Self::Token(value)
+    }
+}
+
+impl From<Group> for IterItem {
+    fn from(value: Group) -> Self {
+        Self::Group(value)
+    }
+}
+
+impl From<quasiquote::Interpolation> for IterItem {
+    fn from(value: quasiquote::Interpolation) -> Self {
+        Self::Interpolation(value)
+    }
+}
+
 #[allow(clippy::let_unit_value)]
 impl Parser {
     pub fn new(token_stream: TokenStream) -> Self {
@@ -52,28 +70,29 @@ impl Parser {
 
 impl Iterator for Parser {
     type Item = IterItem;
+
     fn next(&mut self) -> Option<Self::Item> {
+        use quasiquote::Interpolation;
+        use quasiquote::Token;
         use NonZeroUsize as Nth;
-        let token = self.0.next()?;
-        Some(if let TokenTree::Punct(ref punct) = token
-            && punct.as_char() == '#'
-            && let Some(TokenTree::Ident(ident)) = self.0.peek_nth(Nth::new(1).unwrap()).cloned()
-        {
-            self.0.consume(Nth::new(1).unwrap());
-            IterItem::Interpolation(quasiquote::Interpolation::Binding(ident))
-        } else if let TokenTree::Punct(ref punct) = token
-              && punct.as_char() == '#'
-              && let Some(TokenTree::Group(group)) = self.0.peek_nth(Nth::new(1).unwrap()).cloned()
-              && let Delimiter::Parenthesis | Delimiter::Brace = group.delimiter()
-        {
-            todo!()
-        } else {
-            match token {
-                TokenTree::Ident(i) => IterItem::Token(quasiquote::Token::Ident(i)),
-                TokenTree::Literal(l) => IterItem::Token(quasiquote::Token::Literal(l)),
-                TokenTree::Punct(p) => IterItem::Token(quasiquote::Token::Punct(p)),
-                TokenTree::Group(g) => IterItem::Group(g),
-            }
-        })
+        Some(
+            match (
+                self.0.next()?,
+                self.0.peek_nth(Nth::new(1).unwrap()).cloned(),
+                self.0.peek_nth(Nth::new(2).unwrap()).cloned(),
+                self.0.peek_nth(Nth::new(3).unwrap()).cloned(),
+            ) {
+                (TokenTree::Punct(punct), Some(TokenTree::Ident(binding)), ..)
+                    if punct.as_char() == '#' =>
+                {
+                    self.0.consume(Nth::new(1).unwrap());
+                    Interpolation::Binding(binding).into()
+                }
+                (TokenTree::Literal(literal), ..) => Token::Literal(literal).into(),
+                (TokenTree::Punct(punct), ..) => Token::Punct(punct).into(),
+                (TokenTree::Ident(ident), ..) => Token::Ident(ident).into(),
+                (TokenTree::Group(group), ..) => group.into(),
+            },
+        )
     }
 }
