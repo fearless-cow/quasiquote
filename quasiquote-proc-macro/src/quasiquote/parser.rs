@@ -88,6 +88,12 @@ impl Iterator for Parser {
                     self.0.consume(Nth::new(1).unwrap());
                     Interpolation::Binding(binding).into()
                 }
+                (TokenTree::Punct(punct), Some(TokenTree::Group(group)), ..)
+                    if punct.as_char() == '#' && matches!(group.delimiter(), Delimiter::Brace) =>
+                {
+                    self.0.consume(Nth::new(1).unwrap());
+                    Interpolation::Expression(group).into()
+                }
                 (TokenTree::Literal(literal), ..) => Token::Literal(literal).into(),
                 (TokenTree::Punct(punct), ..) => Token::Punct(punct).into(),
                 (TokenTree::Ident(ident), ..) => Token::Ident(ident).into(),
