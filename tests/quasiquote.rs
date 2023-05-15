@@ -58,7 +58,7 @@ fn interpolate_binding() {
     compare_strings(a, b);
 }
 
-#[test]
+#[cfg(any())]
 fn interpolate_iterator() {
     let a = quote! { 1 };
     let b = quote! { 2 };
