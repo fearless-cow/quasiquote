@@ -58,6 +58,18 @@ fn interpolate_binding() {
     compare_strings(a, b);
 }
 
+#[test]
+fn interpolate_expression() {
+    let quoted = quasiquote! {
+        let x = #{ 1 + 1 };
+    }
+    .to_string();
+    let expected = stringify! {
+        let x = 2;
+    };
+    compare_strings(quoted, expected);
+}
+
 #[cfg(any())]
 fn interpolate_iterator() {
     let a = quote! { 1 };
