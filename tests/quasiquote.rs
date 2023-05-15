@@ -69,15 +69,3 @@ fn interpolate_expression() {
     };
     compare_strings(quoted, expected);
 }
-
-#[cfg(any())]
-fn interpolate_iterator() {
-    let a = quote! { 1 };
-    let b = quote! { 2 };
-    let c = quote! { 3 };
-    let array = [a, b, c];
-    let iter = array.iter();
-    let quoted = quasiquote! {
-        let array = [#(#iter),*];
-    };
-}
