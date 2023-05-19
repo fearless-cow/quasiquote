@@ -3,7 +3,6 @@
 mod interpolation;
 mod parser;
 mod token;
-//mod interpolation;
 
 use interpolation::Interpolation;
 use parser::Parser;

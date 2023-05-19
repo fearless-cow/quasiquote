@@ -1,11 +1,12 @@
-use crate::quasiquote::QuasiQuote;
-use proc_macro2::{Group, Ident, TokenStream};
+use crate::quasiquote::{self, parser, QuasiQuote};
+use proc_macro2::{Group, Ident, Punct, TokenStream};
 use quote::quote;
 
 #[derive(Debug, Clone)]
 pub(crate) enum Interpolation {
     Binding(Ident),
     Expression(Group),
+    Repetition(Group, Option<Punct>),
 }
 
 impl QuasiQuote for Interpolation {
@@ -17,6 +18,13 @@ impl QuasiQuote for Interpolation {
             Self::Expression(group) => {
                 let inner = group.stream();
                 quote! { {#inner} }
+            }
+            Self::Repetition(group, separator) => {
+                quote! {
+                    ::quasiquote::quote::quote! {
+                        # #group #separator *
+                    }
+                }
             }
         }
     }

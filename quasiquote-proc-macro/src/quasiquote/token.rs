@@ -53,7 +53,7 @@ impl QuasiQuote for Group {
         let delimiter = self.delimiter().quasiquote();
         quote! {{
             let inner = #inner;
-            ::quasiquote::proc_macro2::Group::new(#delimiter, #inner)
+            ::quasiquote::proc_macro2::Group::new(#delimiter, inner)
         }}
     }
 }

@@ -33,7 +33,7 @@ impl InnerIterator {
     }
 
     fn consume(&mut self, n: NonZeroUsize) {
-        for _ in 1..n.get() {
+        for _ in 1..=n.get() {
             match self.0.next() {
                 Some(_) => continue,
                 None => break,
@@ -94,6 +94,32 @@ impl Iterator for Parser {
                     self.0.consume(Nth::new(1).unwrap());
                     Interpolation::Expression(group).into()
                 }
+                (
+                    TokenTree::Punct(punct),
+                    Some(TokenTree::Group(group)),
+                    Some(TokenTree::Punct(separator)),
+                    Some(TokenTree::Punct(wildcard)),
+                ) if punct.as_char() == '#'
+                    && matches!(group.delimiter(), Delimiter::Parenthesis)
+                    && separator.as_char() != '*'
+                    && wildcard.as_char() == '*' =>
+                {
+                    self.0.consume(Nth::new(3).unwrap());
+                    Interpolation::Repetition(group, Some(separator)).into()
+                }
+                (
+                    TokenTree::Punct(punct),
+                    Some(TokenTree::Group(group)),
+                    Some(TokenTree::Punct(wildcard)),
+                    _,
+                ) if punct.as_char() == '#'
+                    && matches!(group.delimiter(), Delimiter::Parenthesis)
+                    && wildcard.as_char() == '*' =>
+                {
+                    self.0.consume(Nth::new(2).unwrap());
+                    Interpolation::Repetition(group, None).into()
+                }
+
                 (TokenTree::Literal(literal), ..) => Token::Literal(literal).into(),
                 (TokenTree::Punct(punct), ..) => Token::Punct(punct).into(),
                 (TokenTree::Ident(ident), ..) => Token::Ident(ident).into(),
