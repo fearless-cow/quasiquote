@@ -65,7 +65,20 @@ fn interpolate_expression() {
     }
     .to_string();
     let expected = stringify! {
-        let x = 2;
+        let x = 2i32;
+    };
+    compare_strings(quoted, expected);
+}
+
+#[test]
+fn interpolate_binding_repetition() {
+    let iter = 0..=5;
+    let quoted = quasiquote! {
+        let x = [#(#iter),*];
+    }
+    .to_string();
+    let expected = stringify! {
+        let x = [0i32, 1i32, 2i32, 3i32, 4i32, 5i32];
     };
     compare_strings(quoted, expected);
 }
