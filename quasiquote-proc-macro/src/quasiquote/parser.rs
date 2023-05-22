@@ -1,7 +1,6 @@
 use crate::quasiquote;
 use itertools::{Itertools, MultiPeek};
-use proc_macro2::{Delimiter, Group, Ident, Punct, TokenStream, TokenTree};
-use std::iter;
+use proc_macro2::{Delimiter, Group, TokenStream, TokenTree};
 use std::num::NonZeroUsize;
 
 type TokenIter = proc_macro2::token_stream::IntoIter;

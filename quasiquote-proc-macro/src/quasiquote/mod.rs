@@ -1,14 +1,11 @@
-#![allow(unused_imports)]
-
 mod interpolation;
 mod parser;
 mod token;
 
 use interpolation::Interpolation;
 use parser::Parser;
-use proc_macro2::{Delimiter, Group, Ident, Literal, Punct, Spacing, TokenStream, TokenTree};
+use proc_macro2::{Group, TokenStream};
 use quote::{quote, ToTokens};
-use std::iter::Peekable;
 use token::Token;
 
 trait QuasiQuote {
