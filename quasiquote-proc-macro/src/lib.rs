@@ -1,3 +1,5 @@
+#![deny(clippy::pedantic, clippy::use_self)]
+
 pub(crate) mod quasiquote;
 
 #[cfg(debug_assertions)]

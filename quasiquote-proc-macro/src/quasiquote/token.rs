@@ -72,8 +72,8 @@ impl QuasiQuote for Delimiter {
 impl QuasiQuote for Spacing {
     fn quasiquote(&self) -> TokenStream {
         match self {
-            Spacing::Alone => quote! {::quasiquote::proc_macro2::Spacing::Alone},
-            Spacing::Joint => quote! {::quasiquote::proc_macro2::Spacing::Joint},
+            Self::Alone => quote! {::quasiquote::proc_macro2::Spacing::Alone},
+            Self::Joint => quote! {::quasiquote::proc_macro2::Spacing::Joint},
         }
     }
 }
