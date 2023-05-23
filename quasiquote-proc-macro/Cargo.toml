@@ -1,7 +1,12 @@
 [package]
 name = "quasiquote-proc-macro"
+description = "quasiquote proc macro implementation"
 version = "0.0.0"
 edition = "2021"
+authors = ["Fearless Cow"]
+license = "GPL-3.0-or-later"
+repository = "https://github.com/fearless-cow/quasiquote"
+homepage = "https://github.com/fearless-cow/quasiquote"
 
 [lib]
 proc-macro = true
