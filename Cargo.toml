@@ -7,7 +7,7 @@ proc-macro2 = "1.0.52"
 [package]
 name = "quasiquote"
 description = "quote compatible quasiquote macro with support for interpolating expressions"
-version = "0.0.0"
+version = "0.0.1"
 edition = "2021"
 authors = ["Fearless Cow"]
 license = "GPL-3.0-or-later"
@@ -16,7 +16,7 @@ homepage = "https://github.com/fearless-cow/quasiquote"
 keywords = ["macro", "quote"]
 
 [dependencies]
-quasiquote-proc-macro = { path = "quasiquote-proc-macro" }
+quasiquote-proc-macro = { path = "quasiquote-proc-macro", version = "0.0.1" }
 quote = { workspace = true }
 proc-macro2 = { workspace = true }
 
