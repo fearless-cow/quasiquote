@@ -1,6 +1,6 @@
 use crate::quasiquote;
 use itertools::{Itertools, MultiPeek};
-use proc_macro2::{Delimiter, Group, TokenStream, TokenTree};
+use proc_macro2::{Delimiter, Group, Punct, Spacing, TokenStream, TokenTree};
 use std::num::NonZeroUsize;
 
 type TokenIter = proc_macro2::token_stream::IntoIter;
@@ -118,7 +118,14 @@ impl Iterator for Parser {
                     self.0.consume(Nth::new(2).unwrap());
                     Interpolation::Repetition(group, None).into()
                 }
-
+                (
+                    TokenTree::Punct(punct),
+                    Some(TokenTree::Punct(following)),
+                    Some(TokenTree::Ident(_)),
+                    _,
+                ) if following.as_char() == '#' => {
+                    Token::Punct(Punct::new(punct.as_char(), Spacing::Alone)).into()
+                }
                 (TokenTree::Literal(literal), ..) => Token::Literal(literal).into(),
                 (TokenTree::Punct(punct), ..) => Token::Punct(punct).into(),
                 (TokenTree::Ident(ident), ..) => Token::Ident(ident).into(),
