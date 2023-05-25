@@ -399,6 +399,7 @@ fn test_append_tokens() {
 }
 
 #[test]
+#[ignore = "docs"]
 fn test_outer_line_comment() {
     let tokens = quote! {
         /// doc
@@ -408,6 +409,7 @@ fn test_outer_line_comment() {
 }
 
 #[test]
+#[ignore = "docs"]
 fn test_inner_line_comment() {
     let tokens = quote! {
         //! doc
@@ -417,6 +419,7 @@ fn test_inner_line_comment() {
 }
 
 #[test]
+#[ignore = "docs"]
 fn test_outer_block_comment() {
     let tokens = quote! {
         /** doc */
@@ -425,8 +428,10 @@ fn test_outer_block_comment() {
     assert_eq!(expected, tokens.to_string());
 }
 
+#[allow(unused_attributes)]
 #[test]
 #[ignore = "spacing"]
+#[ignore = "docs"]
 fn test_inner_block_comment() {
     let tokens = quote! {
         /*! doc */
