@@ -21,9 +21,19 @@ impl QuasiQuote for Token {
 
 impl QuasiQuote for Ident {
     fn quasiquote(&self) -> TokenStream {
+        let span = quote! { ::quasiquote::proc_macro2::Span::call_site() };
         let s = self.to_string();
-        quote! {
-            ::quasiquote::proc_macro2::Ident::new(#s, ::quasiquote::proc_macro2::Span::call_site())
+        match s.strip_prefix("r#") {
+            Some(stripped) => {
+                quote! {
+                    ::quasiquote::proc_macro2::Ident::new_raw(#stripped, #span)
+                }
+            }
+            None => {
+                quote! {
+                    ::quasiquote::proc_macro2::Ident::new(#s, #span)
+                }
+            }
         }
     }
 }
